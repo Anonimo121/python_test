@@ -1,25 +1,15 @@
-from email import message
-from http import client
 import socket
+import sys
 
-def client_program():
-    host = socket.gethostname()
-    port = 5000
+HOST, PORT = "10.0.0.255", 5000
+data = " ".join(sys.argv[1:])
 
-    client_socket = socket.socket()
-    client_socket.connect((host, port))
-
-    message = input(" -> ")
-
-    while message.lower().strip() != 'bye':
-        client_socket.send(message.encode())
-        data = client_socket.recv(1024).decode()
-
-        print('Received from server: ' + data)
-
-        message = input(" -> ")
-
-    client_socket.close()
-
-if __name__ == '__main__':
-    client_program()
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+    
+    sock.connect((HOST, PORT))
+    sock.sendall(bytes(data + "\n -> ", "utf-8"))
+    
+    received = str(sock.recv(1024), "utf-8")
+    
+print(f"Sent:    {data}")
+print(f"Recdived:   {received}")
